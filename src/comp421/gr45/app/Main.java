@@ -132,11 +132,17 @@ public class Main {
 
 		} else if (choice == 3) { // List available properties
 
+			System.out.println("Please indicate the city and date range for your search.");
+			
+			String city = requestString("City");
+			String start = requestDate("Start Date");
+			String end = requestDate("End Date");
+			
 			
 
 		} else if (choice == 4) { // Request Booking
 
-		} else if (choice == 5) { // Confirm Booking
+		} else if (choice == 5) { // List all bookings in date range
 
 		} else { // Add review
 
