@@ -1,3 +1,9 @@
+//TODO
+// 3, 4, 5, 6
+// Helper method to print tuples for 3 and 5
+// Check successful insert in 1, 2, 4, 6
+// Take screenshots for submission
+
 package comp421.gr45.app;
 
 import java.sql.Connection;
@@ -132,11 +138,18 @@ public class Main {
 
 		} else if (choice == 3) { // List available properties
 
+			System.out.println("Please indicate the city and date range for your search.");
+			
+			String city = requestString("City");
+			String start = requestDate("Start Date");
+			String end = requestDate("End Date");
+			
 			
 
 		} else if (choice == 4) { // Request Booking
 
 		} else if (choice == 5) { // List bookings over date range
+
 
 		} else { // Add review
 			System.out.println("To add a review, please provide the following inputs:");
