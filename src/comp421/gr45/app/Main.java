@@ -4,6 +4,9 @@
 // Check successful insert in 1, 2, 4, 6
 // Take screenshots for submission
 
+// check true/false in format calls
+
+
 package comp421.gr45.app;
 
 import java.sql.Connection;
@@ -48,9 +51,7 @@ public class Main {
 		while (choice != 7) {
 			System.out.println("What would you like to do?");
 
-			for (int i = 1; i <= 7; i++) {
-				System.out.println(option(i));
-			}
+			options();
 
 			choice = promptVal(1, 7);
 			if (choice == 7) {
@@ -62,21 +63,14 @@ public class Main {
 		}
 	}
 
-	private static String option(int num) {
-		if (num == 1)
-			return "1 - Add Property";
-		else if (num == 2)
-			return "2 - Create Account";
-		else if (num == 3)
-			return "3 - List available properties for given city/dates";
-		else if (num == 4)
-			return "4 - Request Booking";
-		else if (num == 5)
-			return "5 - List bookings over date range";
-		else if (num == 6)
-			return "6 - Add Review (as Guest or Host)";
-		else
-			return "7 - Quit";
+	private static void options() {
+		System.out.println("1 - Add Property");
+		System.out.println("2 - Create Account");
+		System.out.println("3 - List available properties for given city/dates");
+		System.out.println("4 - Request Booking");
+		System.out.println("5 - List bookings over date range");
+		System.out.println("6 - Add Review (as Guest or Host)");
+		System.out.println("7 - Quit");
 	}
 
 	private static int promptVal(int min, int max) {
@@ -96,7 +90,7 @@ public class Main {
 	private static void executeChoice(int choice) throws SQLException {
 		if (choice == 1) { // Add Property
 
-			System.out.print("To add a new property, please provide the following inputs:");
+			System.out.println("To add a new property, please provide the following inputs:");
 
 			String name = requestString("Name");
 			String desc = requestString("Description");
@@ -126,6 +120,10 @@ public class Main {
 			String name = requestString("Full name");
 			String gder = requestString("Gender");
 			String date = requestDate("Date of birth");
+			String type = requestString("Guest or Host");
+			while (!type.equalsIgnoreCase("host") && !type.equalsIgnoreCase("guest")) {
+				type = requestString("Guest or Host");
+			}
 			
 			String query = "INSERT INTO UserAccount VALUES (";
 			query += formatString(user, true);
@@ -136,6 +134,21 @@ public class Main {
 			query += ")";
 			
 			stmt.executeUpdate(query);
+			
+			query = "INSERT INTO ";
+			if (type.equalsIgnoreCase("Host")) {
+				query += "Host VALUES (";
+				query += formatString(user, false);
+				query += ")";
+			} else {
+				query += "Guest VALUES (";
+				query += formatString(user, true);
+				query += "0";
+				query += ")";
+			}
+			
+			stmt.executeUpdate(query);
+			
 
 		} else if (choice == 3) { // List available properties
 
@@ -257,18 +270,40 @@ public class Main {
 		
 		return formatted;
 	}
+	
+	private static String queryDateFormat(String date) {
+		String queryFormattedDate = "'";
+		
+		String[] split = date.split("/");
+		int day = Integer.parseInt(split[0]), month = Integer.parseInt(split[1]), year = Integer.parseInt(split[2]);
+		
+		queryFormattedDate += (year + "-");
+		
+		if (month < 10)
+			queryFormattedDate += ("0" + month + "-");
+		else
+			queryFormattedDate += (month + "-");
+		
+		if (day < 10)
+			queryFormattedDate += ("0" + day + "-");
+		else
+			queryFormattedDate += (day + "-");
+		
+		queryFormattedDate += "'";
+		return queryFormattedDate;
+	}
 
 	private static boolean dateValid(String date) {
-		String[] dashSplit = date.split("/");
-		if (dashSplit.length != 3) // check there are 3 parts to the date
+		String[] split = date.split("/");
+		if (split.length != 3) // check there are 3 parts to the date
 			return false;
 
 		int day, month, year;
 
 		try {
-			day = Integer.parseInt(dashSplit[0]);
-			month = Integer.parseInt(dashSplit[1]);
-			year = Integer.parseInt(dashSplit[2]);
+			day = Integer.parseInt(split[0]);
+			month = Integer.parseInt(split[1]);
+			year = Integer.parseInt(split[2]);
 		} catch (NumberFormatException e) { // check that each part is a number
 			return false;
 		}
