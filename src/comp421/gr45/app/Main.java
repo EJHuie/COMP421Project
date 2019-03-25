@@ -98,7 +98,15 @@ public class Main {
 			String ctry = requestString("Country");
 			String host = requestString("Host username");
 
-			String query = "INSERT INTO Property VALUES (" + formatStrings(name, desc, addr, city, ctry, host) + ")";
+			String query = "INSERT INTO Property VALUES (";
+			query += formatString(addr, true);
+			query += formatString(name, true);
+			query += formatString(desc, true);
+			query += formatString(city, true);
+			query += formatString(ctry, true);
+			query += ("0, ");
+			query += formatString(host, false);
+			query += ")";
 
 			stmt.executeUpdate(query);
 
@@ -113,13 +121,17 @@ public class Main {
 			String date = requestDate("Date of birth");
 			
 			String query = "INSERT INTO UserAccount VALUES (";
-			query += formatStrings(user, pass, name, gder);
-			query += ", ";
-			query += formatDate(date);
+			query += formatString(user, true);
+			query += formatString(pass, true);
+			query += formatString(name, true);
+			query += formatString(gder, true);
+			query += formatDate(date, false);
 			query += ")";
+			
+			stmt.executeUpdate(query);
 
 		} else if (choice == 3) { // List available properties
-			
+
 			
 
 		} else if (choice == 4) { // Request Booking
@@ -150,41 +162,35 @@ public class Main {
 	}
 
 	private static String requestDate(String inputName) {
-		System.out.println(inputName + "? Please input as DD-MM-YYYY.");
+		System.out.println(inputName + "? Please input as DD/MM/YYYY.");
 		String result = reader.next();
 		while (!dateValid(result)) {
-			System.out.println("Invalid date format. Please enter the date as DD-MM-YYYY (including dashes)");
+			System.out.println("Invalid date format. Please enter the date as DD/MM/YYYY (including slashes)");
 			result = reader.next();
 		}
 		return result;
 	}
 
-	private static String formatStrings(String... vals) {
-		String formatted = "";
-
-		for (int i = 0; i < vals.length; i++) {
-			formatted += ("'" + vals[i] + "'"); // surround each String with ''
-			if (i != vals.length - 1) {
-				formatted += ", "; // add a comma after each parameter except the last
-			}
-		}
-
+	private static String formatString(String val, boolean addComma) {
+		String formatted = "'" + val + "'";
+		if (addComma)
+			formatted += ", ";
 		return formatted;
 	}
 	
-	private static String formatDate(String date) {
+	private static String formatDate(String date, boolean addComma) {
 		String formatted = "";
 		
-		String[] split = date.split("-");
-		int day = Integer.parseInt(split[0]), month = Integer.parseInt(split[1]), year = Integer.parseInt(split[2]);
+		formatted += ("TO_DATE('" + date + "', 'DD/MM/YYYY')");
 		
-		formatted += ("TO_DATE('" + day + "/" + month + "/" + year + "', 'DD/MM/YYYY')");
+		if (addComma)
+			formatted += ", ";
 		
 		return formatted;
 	}
 
 	private static boolean dateValid(String date) {
-		String[] dashSplit = date.split("-");
+		String[] dashSplit = date.split("/");
 		if (dashSplit.length != 3) // check there are 3 parts to the date
 			return false;
 
