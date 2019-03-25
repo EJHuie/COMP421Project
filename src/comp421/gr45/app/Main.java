@@ -11,6 +11,7 @@ import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.InputMismatchException;
 
 public class Main {
 
@@ -151,32 +152,87 @@ public class Main {
 		} else if (choice == 5) { // List bookings over date range
 
 
-		} else { // Add review
+		} else { // Add review or critique
+			int reviewer=0;
+			boolean isValid = false;
+			while (isValid == false){
+				System.out.println("Specify if you are a writing a review as a host or guest. Type 1 if you are the host or 2 if you are the guest: ");
+				if (reader.hasNextInt())
+				{
+					reviewer = reader.nextInt();
+					isValid = true;
+				}
+				else
+				{
+					System.out.println(
+							"Invalid entry. Try again.");
+				}
+				reader.nextLine();
+				if(isValid==true && (reviewer < 1 || reviewer > 2)){
+					System.out.println("Invalid number. Please choose enter 1 if you are the host or 2 if you are the guest");
+				}
+			}
+
+//			while (!reader.hasNextInt() &&(reviewer < 1 || reviewer > 2)) {
+//				System.out.println("Invalid character found, please enter 1 if you are the host or 2 if you are the guest");
+//				reviewer = reader.next();
+//			}
+
 			System.out.println("To add a review, please provide the following inputs:");
 
-			String user = requestString("Review content");
-			String pass = requestString("Rating number");
-			String name = requestString("Host name");
-			String gder = requestString("Booking ID ");
-			String date = requestString("status");
+			String content = requestString("Review content");
+			System.out.println("Rating number");
+			int rating = promptVal(1,5);
+			String name = requestString("Your name");
+			int bid = requestInteger("Booking ID");
+			if (reviewer == 1) {
+				System.out.println("host");
+				String query = "INSERT INTO Review VALUES (";
+				query += formatString(content, true);
+				query += formatString(Integer.toString(rating), true);
+				query += formatString(name, true);
+				query += formatString(Integer.toString(bid), true);
+				query += ")";
+
+				stmt.executeUpdate(query);
+			} else if (reviewer == 2) {
+				System.out.println("guest");
+				String query = "INSERT INTO Critique VALUES (";
+				query += formatString(content, true);
+				query += formatString(Integer.toString(rating), true);
+				query += formatString(name, true);
+				query += formatString(Integer.toString(bid), true);
+				query += ")";
+
+				stmt.executeUpdate(query);
+			}
 		}
 	}
 
 	private static String requestString(String inputName) {
 		System.out.println(inputName + "?");
-		String result = reader.next();
+		String result = reader.nextLine();
 		return result;
 	}
 
-	private static String requestInteger(String inputName) {
+	private static int requestInteger(String inputName) {
 		System.out.println(inputName + "?");
-		String result = reader.next();
-		return result;
+		int resultNum = 0;
+		boolean checkInt= false;
+		while (checkInt==false) {
+			try {
+				resultNum = reader.nextInt();
+				checkInt = true;
+			} catch (Exception e) {
+				System.out.println("Invalid character found, please enter numeric values only");
+			}
+		}
+		return resultNum;
 	}
 
 	private static String requestDate(String inputName) {
 		System.out.println(inputName + "? Please input as DD/MM/YYYY.");
-		String result = reader.next();
+		String result = reader.nextLine();
 		while (!dateValid(result)) {
 			System.out.println("Invalid date format. Please enter the date as DD/MM/YYYY (including slashes)");
 			result = reader.next();
