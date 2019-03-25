@@ -135,13 +135,7 @@ public class Main {
 			
 
 		} else if (choice == 4) { // Request Booking
-			System.out.println("To request a booking, please provide the following inputs:");
 
-			String user = requestString("ID #");
-			String pass = requestString("Start date");
-			String name = requestString("End date");
-			String gder = requestString("Price");
-			String date = requestDate("status");
 		} else if (choice == 5) { // List bookings over date range
 
 		} else { // Add review
@@ -156,6 +150,12 @@ public class Main {
 	}
 
 	private static String requestString(String inputName) {
+		System.out.println(inputName + "?");
+		String result = reader.next();
+		return result;
+	}
+
+	private static String requestInteger(String inputName) {
 		System.out.println(inputName + "?");
 		String result = reader.next();
 		return result;
