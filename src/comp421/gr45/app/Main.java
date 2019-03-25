@@ -123,11 +123,23 @@ public class Main {
 			
 
 		} else if (choice == 4) { // Request Booking
+			System.out.println("To request a booking, please provide the following inputs:");
 
-		} else if (choice == 5) { // Confirm Booking
+			String user = requestString("ID #");
+			String pass = requestString("Start date");
+			String name = requestString("End date");
+			String gder = requestString("Price");
+			String date = requestDate("status");
+		} else if (choice == 5) { // List bookings over date range
 
 		} else { // Add review
+			System.out.println("To add a review, please provide the following inputs:");
 
+			String user = requestString("Review content");
+			String pass = requestString("Rating number");
+			String name = requestString("Host name");
+			String gder = requestString("Booking ID ");
+			String date = requestString("status");
 		}
 	}
 

@@ -117,10 +117,10 @@ class simpleJDBC
             System.out.println("DONE");
 
             // Dropping a table
-//            String dropSQL = "DROP TABLE " + tableName;
-//            System.out.println ( dropSQL ) ;
-//            statement.executeUpdate ( dropSQL ) ;
-//            System.out.println ("DONE");
+            String dropSQL = "DROP TABLE " + tableName;
+            System.out.println ( dropSQL ) ;
+            statement.executeUpdate ( dropSQL ) ;
+            System.out.println ("DONE");
         } catch (SQLException e)
         {
             sqlCode = e.getErrorCode(); // Get SQLCODE
