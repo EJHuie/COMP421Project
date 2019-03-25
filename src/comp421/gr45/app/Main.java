@@ -25,7 +25,6 @@ public class Main {
 
 		// Connect
 		conn = DriverManager.getConnection(url, "cs421g45", "compgroup45");
-		
 		stmt = conn.createStatement();
 
 		execLoop();
@@ -38,8 +37,6 @@ public class Main {
 	public static void execLoop() throws SQLException {
 
 		int choice = 0;
-
-		stmt = conn.createStatement();
 
 		while (choice != 7) {
 			System.out.println("What would you like to do?");
@@ -114,8 +111,16 @@ public class Main {
 			String name = requestString("Full name");
 			String gder = requestString("Gender");
 			String date = requestDate("Date of birth");
+			
+			String query = "INSERT INTO UserAccount VALUES (";
+			query += formatStrings(user, pass, name, gder);
+			query += ", ";
+			query += formatDate(date);
+			query += ")";
 
 		} else if (choice == 3) { // List available properties
+			
+			
 
 		} else if (choice == 4) { // Request Booking
 
@@ -159,6 +164,9 @@ public class Main {
 		String formatted = "";
 		
 		String[] split = date.split("-");
+		int day = Integer.parseInt(split[0]), month = Integer.parseInt(split[1]), year = Integer.parseInt(split[2]);
+		
+		formatted += ("TO_DATE('" + day + "/" + month + "/" + year + "', 'DD/MM/YYYY')");
 		
 		return formatted;
 	}
