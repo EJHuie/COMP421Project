@@ -1,3 +1,9 @@
+//TODO
+// 3, 4, 5, 6
+// Helper method to print tuples for 3 and 5
+// Check successful insert in 1, 2, 4, 6
+// Take screenshots for submission
+
 package comp421.gr45.app;
 
 import java.sql.Connection;
