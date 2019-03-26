@@ -1,8 +1,10 @@
 //TODO
-// 3, 4, 5, 6
+// 3, 4, 5, 6 DONE
 // Helper method to print tuples for 3 and 5
 // Check successful insert in 1, 2, 4, 6
 // Take screenshots for submission
+
+// check true/false in format calls
 
 package comp421.gr45.app;
 
@@ -20,14 +22,14 @@ public class Main {
 	private static Connection conn;
 
 	public static void main(String[] args) throws SQLException {
-		
-		// Load the Postgres JDBC driver
+
+		// Load the Postgre JDBC driver
 		try {
-		DriverManager.registerDriver(new org.postgresql.Driver());
+			DriverManager.registerDriver(new org.postgresql.Driver());
 		} catch (Exception e) {
 			System.out.println("Class not found");
 		}
-		
+
 		String url = "jdbc:postgresql://comp421.cs.mcgill.ca:5432/cs421";
 
 		// Connect
@@ -48,9 +50,7 @@ public class Main {
 		while (choice != 7) {
 			System.out.println("What would you like to do?");
 
-			for (int i = 1; i <= 7; i++) {
-				System.out.println(option(i));
-			}
+			options();
 
 			choice = promptVal(1, 7);
 			if (choice == 7) {
@@ -62,21 +62,14 @@ public class Main {
 		}
 	}
 
-	private static String option(int num) {
-		if (num == 1)
-			return "1 - Add Property";
-		else if (num == 2)
-			return "2 - Create Account";
-		else if (num == 3)
-			return "3 - List available properties for given city/dates";
-		else if (num == 4)
-			return "4 - Request Booking";
-		else if (num == 5)
-			return "5 - List bookings over date range";
-		else if (num == 6)
-			return "6 - Add Review (as Guest or Host)";
-		else
-			return "7 - Quit";
+	private static void options() {
+		System.out.println("1 - Add Property");
+		System.out.println("2 - Create Account");
+		System.out.println("3 - List available properties for given city/dates");
+		System.out.println("4 - Request Booking");
+		System.out.println("5 - List bookings over date range");
+		System.out.println("6 - Add Review (as Guest or Host)");
+		System.out.println("7 - Quit");
 	}
 
 	private static int promptVal(int min, int max) {
@@ -96,7 +89,7 @@ public class Main {
 	private static void executeChoice(int choice) throws SQLException {
 		if (choice == 1) { // Add Property
 
-			System.out.print("To add a new property, please provide the following inputs:");
+			System.out.println("To add a new property, please provide the following inputs:");
 
 			String name = requestString("Name");
 			String desc = requestString("Description");
@@ -115,7 +108,12 @@ public class Main {
 			query += formatString(host, false);
 			query += ")";
 
-			stmt.executeUpdate(query);
+			try {
+				stmt.executeUpdate(query);
+			} catch (Exception e) {
+				System.out.println("The query could not be executed for the following reason:");
+				System.out.println(e.getMessage() + "\n\n");
+			}
 
 		} else if (choice == 2) { // Create Account
 
@@ -126,7 +124,11 @@ public class Main {
 			String name = requestString("Full name");
 			String gder = requestString("Gender");
 			String date = requestDate("Date of birth");
-			
+			String type = requestString("Guest or Host");
+			while (!type.equalsIgnoreCase("host") && !type.equalsIgnoreCase("guest")) {
+				type = requestString("Guest or Host");
+			}
+
 			String query = "INSERT INTO UserAccount VALUES (";
 			query += formatString(user, true);
 			query += formatString(pass, true);
@@ -134,49 +136,125 @@ public class Main {
 			query += formatString(gder, true);
 			query += formatDate(date, false);
 			query += ")";
-			
-			stmt.executeUpdate(query);
+
+			try {
+				stmt.executeUpdate(query);
+			} catch (Exception e) {
+				System.out.println("The query could not be executed for the following reason:");
+				System.out.println(e.getMessage() + "\n\n");
+			}
+
+			query = "INSERT INTO ";
+			if (type.equalsIgnoreCase("Host")) {
+				query += "Host VALUES (";
+				query += formatString(user, false);
+				query += ")";
+			} else {
+				query += "Guest VALUES (";
+				query += formatString(user, true);
+				query += "0";
+				query += ")";
+			}
+
+			try {
+				stmt.executeUpdate(query);
+			} catch (Exception e) {
+				System.out.println("The query could not be executed for the following reason:");
+				System.out.println(e.getMessage() + "\n\n");
+			}
 
 		} else if (choice == 3) { // List available properties
 
 			System.out.println("Please indicate the city and date range for your search.");
-			
-			String city = requestString("City");
-			String start = requestDate("Start Date");
-			String end = requestDate("End Date");
-			
-			
 
-		} else if (choice == 4) { // Request Booking
+			String city = requestString("City");
+			String start = requestDate("Start Date"), formattedStart = formatDate(start, false);
+			String end = requestDate("End Date"), formattedEnd = formatDate(end, false);
+
+			String subquery = "SELECT property FROM Availability WHERE startDate <= " + formattedStart
+					+ " AND endDate >= " + formattedEnd;
+
+			String query = "SELECT * FROM Property WHERE cityName = ";
+			query += formatString(city, false);
+			query += " AND address IN (";
+			query += subquery;
+			query += ")";
+
+			try {
+				stmt.executeQuery(query);
+			} catch (Exception e) {
+				System.out.println("The query could not be executed for the following reason:");
+				System.out.println(e.getMessage() + "\n\n");
+			}
+
+		} else if (choice == 4) { // Send message
+
+			System.out.println("To write a new message, please provide the following information:");
+			System.out.println("Start time:");
+			int hour = requestInteger("\tHour"), minute = requestInteger("\tMinute"), second = 0;
+
+			String date = requestDate("Date");
+
+			String content = requestString("Message content (max 512 chars)");
+			String fromUser = requestString("Message sender");
+			String toUser = requestString("Message receiver");
+
+			String query = "INSERT INTO Message VALUES (";
+			query += formatTime(hour, minute, second, true);
+			query += formatDate(date, true);
+			query += formatString(content, true);
+			query += formatString(fromUser, true);
+			query += formatString(toUser, false);
+			query += ")";
+
+			try {
+				stmt.executeUpdate(query);
+			} catch (Exception e) {
+				System.out.println("The query could not be executed for the following reason:");
+				System.out.println(e.getMessage() + "\n\n");
+			}
 
 		} else if (choice == 5) { // List bookings over date range
 
+			System.out.println("Please indicate the date range for your search.");
+
+			String start = requestDate("Start Date"), formattedStart = formatDate(start, false);
+			String end = requestDate("End Date"), formattedEnd = formatDate(end, false);
+
+			String query = "SELECT * FROM Booking WHERE startDate >= " + formattedStart + " AND endDate <= "
+					+ formattedEnd;
+
+			try {
+				stmt.executeQuery(query);
+			} catch (Exception e) {
+				System.out.println("The query could not be executed for the following reason:");
+				System.out.println(e.getMessage() + "\n\n");
+			}
 
 		} else { // Add review or critique
-			int reviewer=0;
+			int reviewer = 0;
 			boolean isValid = false;
-			while (isValid == false){
-				System.out.println("Specify if you are a writing a review as a host or guest. Type 1 if you are the host or 2 if you are the guest: ");
-				if (reader.hasNextInt())
-				{
+			while (isValid == false) {
+				System.out.println(
+						"Specify if you are a writing a review as a host or guest. Type 1 if you are the host or 2 if you are the guest: ");
+				if (reader.hasNextInt()) {
 					reviewer = reader.nextInt();
 					isValid = true;
-				}
-				else
-				{
-					System.out.println(
-							"Invalid entry. Try again.");
+				} else {
+					System.out.println("Invalid entry. Try again.");
 				}
 				reader.nextLine();
-				if(isValid==true && (reviewer < 1 || reviewer > 2)){
-					System.out.println("Invalid number. Please choose enter 1 if you are the host or 2 if you are the guest");
+				if (isValid == true && (reviewer < 1 || reviewer > 2)) {
+					System.out.println(
+							"Invalid number. Please choose enter 1 if you are the host or 2 if you are the guest");
 				}
 			}
 
-//			while (!reader.hasNextInt() &&(reviewer < 1 || reviewer > 2)) {
-//				System.out.println("Invalid character found, please enter 1 if you are the host or 2 if you are the guest");
-//				reviewer = reader.next();
-//			}
+			// while (!reader.hasNextInt() &&(reviewer < 1 || reviewer > 2)) {
+			// System.out.println("Invalid character found, please enter 1 if you are the
+			// host or 2 if you are the guest");
+			// reviewer = reader.next();
+			// }
 
 			System.out.println("To add a review, please provide the following inputs:");
 
@@ -201,6 +279,7 @@ public class Main {
 					System.out.println("Invalid number. Please choose a number 1 to 5");
 				}
 			}
+      
 			String name = requestString("Your name");
 //			int bid = requestInteger("Booking ID");
 			int bid = -1;
@@ -228,7 +307,16 @@ public class Main {
 				query += formatString(Integer.toString(bid), false);
 				query += ")";
 
-				checkSuccessInsert(stmt.executeUpdate(query));
+        int affectedTuples;
+        
+				try {
+					affectedTuples = stmt.executeUpdate(query);
+          checkSuccessInsert(affectedTuples);
+				} catch (Exception e) {
+					System.out.println("The query could not be executed for the following reason:");
+					System.out.println(e.getMessage() + "\n\n");
+				}
+				
 			} else if (reviewer == 2) {
 //				System.out.println("guest");
 				String query = "INSERT INTO Critique VALUES (";
@@ -238,7 +326,16 @@ public class Main {
 				query += formatString(Integer.toString(bid), false);
 				query += ")";
 
-				checkSuccessInsert(stmt.executeUpdate(query));
+        int affectedTuples;
+
+				try {
+					affectedTuples = stmt.executeUpdate(query);
+          checkSuccessInsert(affectedTuples);
+				} catch (Exception e) {
+					System.out.println("The query could not be executed for the following reason:");
+					System.out.println(e.getMessage() + "\n\n");
+				}
+
 			}
 		}
 	}
@@ -254,23 +351,22 @@ public class Main {
 
 	private static String requestString(String inputName) {
 		System.out.println(inputName + "?");
-		String result = reader.nextLine();
+		String result = reader.next();
 		return result;
 	}
 
 	private static int requestInteger(String inputName) {
 		System.out.println(inputName + "?");
-		int resultNum = reader.nextInt();
-//		int resultNum = 0;
-//		boolean checkInt= false;
-//		while (checkInt==false) {
-//			try {
-//				resultNum = reader.nextInt();
-//				checkInt = true;
-//			} catch (Exception e) {
-//				System.out.println("Invalid character found, please enter numeric values only");
-//			}
-//		}
+		int resultNum = -1;
+
+		while (resultNum == -1) {
+			try {
+				resultNum = reader.nextInt();
+			} catch (InputMismatchException e) {
+				System.out.println("Invalid. Please write an integer.");
+				reader.next();
+			}
+		}
 		return resultNum;
 	}
 
@@ -290,29 +386,70 @@ public class Main {
 			formatted += ", ";
 		return formatted;
 	}
-	
+
 	private static String formatDate(String date, boolean addComma) {
-		String formatted = "";
-		
-		formatted += ("TO_DATE('" + date + "', 'DD/MM/YYYY')");
-		
+		String queryFormattedDate = "'";
+
+		String[] split = date.split("/");
+		int day = Integer.parseInt(split[0]), month = Integer.parseInt(split[1]), year = Integer.parseInt(split[2]);
+
+		queryFormattedDate += (year + "-");
+
+		if (month < 10)
+			queryFormattedDate += ("0" + month + "-");
+		else
+			queryFormattedDate += (month + "-");
+
+		if (day < 10)
+			queryFormattedDate += ("0" + day);
+		else
+			queryFormattedDate += day;
+
 		if (addComma)
-			formatted += ", ";
-		
-		return formatted;
+			queryFormattedDate += "', ";
+		else
+			queryFormattedDate += "'";
+
+		return queryFormattedDate;
+	}
+
+	private static String formatTime(int hour, int minute, int second, boolean addComma) {
+		String formattedTime = "'";
+
+		if (hour < 10)
+			formattedTime += ("0" + hour + ":");
+		else
+			formattedTime += (hour + ":");
+
+		if (minute < 10)
+			formattedTime += ("0" + minute + ":");
+		else
+			formattedTime += (minute + ":");
+
+		if (second < 10) {
+			formattedTime += ("0" + second);
+		} else
+			formattedTime += second;
+
+		if (addComma)
+			formattedTime += "', ";
+		else
+			formattedTime += "'";
+
+		return formattedTime;
 	}
 
 	private static boolean dateValid(String date) {
-		String[] dashSplit = date.split("/");
-		if (dashSplit.length != 3) // check there are 3 parts to the date
+		String[] split = date.split("/");
+		if (split.length != 3) // check there are 3 parts to the date
 			return false;
 
 		int day, month, year;
 
 		try {
-			day = Integer.parseInt(dashSplit[0]);
-			month = Integer.parseInt(dashSplit[1]);
-			year = Integer.parseInt(dashSplit[2]);
+			day = Integer.parseInt(split[0]);
+			month = Integer.parseInt(split[1]);
+			year = Integer.parseInt(split[2]);
 		} catch (NumberFormatException e) { // check that each part is a number
 			return false;
 		}
