@@ -61,7 +61,7 @@ public class Main {
 		System.out.println("1 - Add Property");
 		System.out.println("2 - Create Account");
 		System.out.println("3 - List available properties for given city/dates");
-		System.out.println("4 - Request Booking");
+		System.out.println("4 - Sending a message");
 		System.out.println("5 - List bookings over date range");
 		System.out.println("6 - Add Review (as Guest or Host)");
 		System.out.println("7 - Quit");
@@ -85,7 +85,7 @@ public class Main {
 		if (choice == 1) { // Add Property
 
 			System.out.println("To add a new property, please provide the following inputs:");
-
+			reader.nextLine();
 			String name = requestString("Name");
 			String desc = requestString("Description");
 			String addr = requestString("Address");
@@ -114,12 +114,18 @@ public class Main {
 		} else if (choice == 2) { // Create Account
 
 			System.out.println("To create a new account, please provide the following inputs:");
-
+			reader.nextLine();
 			String user = requestString("Username");
 			String pass = requestString("Password");
 			String name = requestString("Full name");
 			String gder = requestString("Gender");
-			String date = requestDate("Date of birth");
+			System.out.println("Date of birth? Please input as DD/MM/YYYY.");
+			String dateOfBirth = reader.next();
+			while (!dateOfBirthValid(dateOfBirth)) {
+				System.out.println("Invalid date of birth. Please enter the date as DD/MM/YYYY (including slashes)");
+				dateOfBirth = reader.next();
+			}
+			reader.nextLine();
 			String type = requestString("Guest or Host");
 			while (!type.equalsIgnoreCase("host") && !type.equalsIgnoreCase("guest")) {
 				type = requestString("Guest or Host");
@@ -130,7 +136,7 @@ public class Main {
 			query += formatString(pass, true);
 			query += formatString(name, true);
 			query += formatString(gder, true);
-			query += formatDate(date, false);
+			query += formatDate(dateOfBirth, false);
 			query += ")";
 
 			try {
@@ -164,7 +170,7 @@ public class Main {
 		} else if (choice == 3) { // List available properties
 
 			System.out.println("Please indicate the city and date range for your search.");
-
+			reader.nextLine();
 			String city = requestString("City");
 			String start = requestDate("Start Date"), formattedStart = formatDate(start, false);
 			String end = requestDate("End Date"), formattedEnd = formatDate(end, false);
@@ -193,7 +199,7 @@ public class Main {
 			int hour = requestInteger("\tHour"), minute = requestInteger("\tMinute"), second = 0;
 
 			String date = requestDate("Date");
-
+			reader.nextLine();
 			String content = requestString("Message content (max 512 chars)");
 			String fromUser = requestString("Message sender");
 			String toUser = requestString("Message receiver");
@@ -268,7 +274,7 @@ public class Main {
 					System.out.println("Invalid entry. Try again.");
 				}
 				reader.nextLine();
-				if (isValid == true && (rating < 1 || rating > 5)) {
+							if (isValid == true && (rating < 1 || rating > 5)) {
 					System.out.println("Invalid number. Please choose a number 1 to 5");
 					isValid=false;
 				}
@@ -397,7 +403,7 @@ public class Main {
 
 	private static String requestString(String inputName) {
 		System.out.println(inputName + "?");
-		String result = reader.next();
+		String result = reader.nextLine();
 		return result;
 	}
 
@@ -507,6 +513,33 @@ public class Main {
 			return false;
 
 		if (year < 2019 || year > 2030) // check year is valid
+			return false;
+
+		return true;
+	}
+
+	private static boolean dateOfBirthValid(String date) {
+		String[] split = date.split("/");
+		if (split.length != 3) // check there are 3 parts to the date
+			return false;
+
+		int day, month, year;
+
+		try {
+			day = Integer.parseInt(split[0]);
+			month = Integer.parseInt(split[1]);
+			year = Integer.parseInt(split[2]);
+		} catch (NumberFormatException e) { // check that each part is a number
+			return false;
+		}
+
+		if (day < 1 || day > 31) // check day is valid
+			return false;
+
+		if (month < 1 || month > 12) // check month is valid
+			return false;
+
+		if (year > 2019) // check year is valid
 			return false;
 
 		return true;
