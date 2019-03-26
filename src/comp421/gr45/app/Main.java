@@ -155,14 +155,31 @@ public class Main {
 			System.out.println("Please indicate the city and date range for your search.");
 			
 			String city = requestString("City");
-			String start = requestDate("Start Date");
-			String end = requestDate("End Date");
+			String start = requestDate("Start Date"), formattedStart = formatDate(start, false);
+			String end = requestDate("End Date"), formattedEnd = formatDate(end, false);
 			
+			String subquery = "SELECT property FROM Availability WHERE startDate <= " + formattedStart + " AND endDate >= " + formattedEnd;
 			
-
+			String query = "SELECT * FROM Property WHERE cityName = ";
+			query += formatString(city, false);
+			query += " AND address IN (";
+			query += subquery;
+			query += ")";
+			
+			stmt.executeQuery(query);
+			
 		} else if (choice == 4) { // Request Booking
 
 		} else if (choice == 5) { // List bookings over date range
+			
+			System.out.println("Please indicate the date range for your search.");
+			
+			String start = requestDate("Start Date"), formattedStart = formatDate(start, false);
+			String end = requestDate("End Date"), formattedEnd = formatDate(end, false);
+			
+			String query = "SELECT * FROM Booking WHERE startDate >= " + formattedStart + " AND endDate <= " + formattedEnd;
+			
+			stmt.executeQuery(query);
 
 
 		} else { // Add review or critique
@@ -261,17 +278,6 @@ public class Main {
 	}
 	
 	private static String formatDate(String date, boolean addComma) {
-		String formatted = "";
-		
-		formatted += ("TO_DATE('" + date + "', 'DD/MM/YYYY')");
-		
-		if (addComma)
-			formatted += ", ";
-		
-		return formatted;
-	}
-	
-	private static String queryDateFormat(String date) {
 		String queryFormattedDate = "'";
 		
 		String[] split = date.split("/");
@@ -289,7 +295,11 @@ public class Main {
 		else
 			queryFormattedDate += (day + "-");
 		
-		queryFormattedDate += "'";
+		if (addComma)
+			queryFormattedDate += "', ";
+		else
+			queryFormattedDate += "'";
+		
 		return queryFormattedDate;
 	}
 
