@@ -1,10 +1,8 @@
 //TODO
 // 3, 4, 5, 6 DONE
 // Helper method to print tuples for 3 and 5
-// Check successful insert in 1, 2, 4, 6
+// Check successful insert in 1, 2, 4, 6 DONE
 // Take screenshots for submission
-
-// check true/false in format calls
 
 package comp421.gr45.app;
 
