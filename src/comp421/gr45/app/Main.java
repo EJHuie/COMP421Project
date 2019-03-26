@@ -153,6 +153,7 @@ public class Main {
 
 
 		} else { // Add review or critique
+			ResultSet rs;
 			int reviewer=0;
 			boolean isValid = false;
 			while (isValid == false){
@@ -170,6 +171,7 @@ public class Main {
 				reader.nextLine();
 				if(isValid==true && (reviewer < 1 || reviewer > 2)){
 					System.out.println("Invalid number. Please choose enter 1 if you are the host or 2 if you are the guest");
+					isValid=false;
 				}
 			}
 
@@ -185,7 +187,7 @@ public class Main {
 			int rating=0;
 			isValid = false;
 			while (isValid == false){
-				System.out.println("Rating number");
+				System.out.println("Rating number (Please choose a number 1 to 5)");
 				if (reader.hasNextInt())
 				{
 					rating = reader.nextInt();
@@ -199,9 +201,42 @@ public class Main {
 				reader.nextLine();
 				if(isValid==true && (rating < 1 || rating > 5)){
 					System.out.println("Invalid number. Please choose a number 1 to 5");
+					isValid=false;
 				}
 			}
-			String name = requestString("Your name");
+			String name = requestString("Your username");
+			isValid = false;
+			while(isValid==false) {
+				if (reviewer == 1) {
+					rs = stmt.executeQuery("SELECT * FROM Host");
+					while (rs.next()) {
+						String username = rs.getString("username");
+						if (username.equals(name)) {
+							isValid = true;
+						}
+
+					}
+					if (isValid == true) {
+						rs.close();
+					} else {
+						name = requestString("Invalid username. Enter another name");
+					}
+				} else {
+					rs = stmt.executeQuery("SELECT * FROM Guest");
+					while (rs.next()) {
+						String username = rs.getString("username");
+						if (username.equals(name)) {
+							isValid = true;
+						}
+
+					}
+					if (isValid == true) {
+						rs.close();
+					} else {
+						name = requestString("Invalid username. Enter another name");
+					}
+				}
+			}
 //			int bid = requestInteger("Booking ID");
 			int bid = -1;
 			isValid = false;
@@ -210,7 +245,20 @@ public class Main {
 				if (reader.hasNextInt())
 				{
 					bid = reader.nextInt();
-					isValid = true;
+					rs = stmt.executeQuery("SELECT * FROM Booking");
+					while (rs.next()) {
+						int bookID = rs.getInt("id");
+						if (bookID == bid) {
+							isValid = true;
+						}
+
+					}
+					if (isValid == true) {
+						rs.close();
+					} else {
+						System.out.println(
+								"Entered booking ID does not exist. Enter another");
+					}
 				}
 				else
 				{
@@ -220,7 +268,6 @@ public class Main {
 				reader.nextLine();
 			}
 			if (reviewer == 1) {
-//				System.out.println("host");
 				String query = "INSERT INTO Review VALUES (";
 				query += formatString(content, true);
 				query += formatString(Integer.toString(rating), true);
@@ -230,7 +277,6 @@ public class Main {
 
 				checkSuccessInsert(stmt.executeUpdate(query));
 			} else if (reviewer == 2) {
-//				System.out.println("guest");
 				String query = "INSERT INTO Critique VALUES (";
 				query += formatString(content, true);
 				query += formatString(Integer.toString(rating), true);
@@ -258,21 +304,21 @@ public class Main {
 		return result;
 	}
 
-	private static int requestInteger(String inputName) {
-		System.out.println(inputName + "?");
-		int resultNum = reader.nextInt();
-//		int resultNum = 0;
-//		boolean checkInt= false;
-//		while (checkInt==false) {
-//			try {
-//				resultNum = reader.nextInt();
-//				checkInt = true;
-//			} catch (Exception e) {
-//				System.out.println("Invalid character found, please enter numeric values only");
-//			}
-//		}
-		return resultNum;
-	}
+//	private static int requestInteger(String inputName) {
+//		System.out.println(inputName + "?");
+//		int resultNum = reader.nextInt();
+////		int resultNum = 0;
+////		boolean checkInt= false;
+////		while (checkInt==false) {
+////			try {
+////				resultNum = reader.nextInt();
+////				checkInt = true;
+////			} catch (Exception e) {
+////				System.out.println("Invalid character found, please enter numeric values only");
+////			}
+////		}
+//		return resultNum;
+//	}
 
 	private static String requestDate(String inputName) {
 		System.out.println(inputName + "? Please input as DD/MM/YYYY.");
