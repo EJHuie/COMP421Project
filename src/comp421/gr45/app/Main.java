@@ -107,8 +107,13 @@ public class Main {
 			query += ("0, ");
 			query += formatString(host, false);
 			query += ")";
-
-			stmt.executeUpdate(query);
+			
+			try {
+				stmt.executeUpdate(query);
+			} catch (Exception e) {
+				System.out.println("The query could not be executed for the following reason:");
+				System.out.println(e.getMessage() + "\n\n");
+			}
 
 		} else if (choice == 2) { // Create Account
 
@@ -132,7 +137,12 @@ public class Main {
 			query += formatDate(date, false);
 			query += ")";
 
-			stmt.executeUpdate(query);
+			try {
+				stmt.executeUpdate(query);
+			} catch (Exception e) {
+				System.out.println("The query could not be executed for the following reason:");
+				System.out.println(e.getMessage() + "\n\n");
+			}
 
 			query = "INSERT INTO ";
 			if (type.equalsIgnoreCase("Host")) {
@@ -146,7 +156,12 @@ public class Main {
 				query += ")";
 			}
 
-			stmt.executeUpdate(query);
+			try {
+				stmt.executeUpdate(query);
+			} catch (Exception e) {
+				System.out.println("The query could not be executed for the following reason:");
+				System.out.println(e.getMessage() + "\n\n");
+			}
 
 		} else if (choice == 3) { // List available properties
 
@@ -165,7 +180,12 @@ public class Main {
 			query += subquery;
 			query += ")";
 
-			stmt.executeQuery(query);
+			try {
+				stmt.executeQuery(query);
+			} catch (Exception e) {
+				System.out.println("The query could not be executed for the following reason:");
+				System.out.println(e.getMessage() + "\n\n");
+			}
 
 		} else if (choice == 4) { // Send message
 
@@ -187,7 +207,12 @@ public class Main {
 			query += formatString(toUser, false);
 			query += ")";
 			
-			stmt.executeUpdate(query);
+			try {
+				stmt.executeUpdate(query);
+			} catch (Exception e) {
+				System.out.println("The query could not be executed for the following reason:");
+				System.out.println(e.getMessage() + "\n\n");
+			}
 
 		} else if (choice == 5) { // List bookings over date range
 
@@ -199,7 +224,12 @@ public class Main {
 			String query = "SELECT * FROM Booking WHERE startDate >= " + formattedStart + " AND endDate <= "
 					+ formattedEnd;
 
-			stmt.executeQuery(query);
+			try {
+				stmt.executeQuery(query);
+			} catch (Exception e) {
+				System.out.println("The query could not be executed for the following reason:");
+				System.out.println(e.getMessage() + "\n\n");
+			}
 
 		} else { // Add review or critique
 			int reviewer = 0;
@@ -242,7 +272,13 @@ public class Main {
 				query += formatString(Integer.toString(bid), true);
 				query += ")";
 
-				stmt.executeUpdate(query);
+				try {
+					stmt.executeUpdate(query);
+				} catch (Exception e) {
+					System.out.println("The query could not be executed for the following reason:");
+					System.out.println(e.getMessage() + "\n\n");
+				}
+				
 			} else if (reviewer == 2) {
 				System.out.println("guest");
 				String query = "INSERT INTO Critique VALUES (";
@@ -252,14 +288,19 @@ public class Main {
 				query += formatString(Integer.toString(bid), true);
 				query += ")";
 
-				stmt.executeUpdate(query);
+				try {
+					stmt.executeUpdate(query);
+				} catch (Exception e) {
+					System.out.println("The query could not be executed for the following reason:");
+					System.out.println(e.getMessage() + "\n\n");
+				}
 			}
 		}
 	}
 
 	private static String requestString(String inputName) {
 		System.out.println(inputName + "?");
-		String result = reader.nextLine();
+		String result = reader.next();
 		return result;
 	}
 
