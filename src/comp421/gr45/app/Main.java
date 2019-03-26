@@ -109,7 +109,8 @@ public class Main {
 			query += ")";
 
 			try {
-				stmt.executeUpdate(query);
+				int affectedTuples = stmt.executeUpdate(query);
+				checkSuccessInsert(affectedTuples);
 			} catch (Exception e) {
 				System.out.println("The query could not be executed for the following reason:");
 				System.out.println(e.getMessage() + "\n\n");
@@ -157,7 +158,8 @@ public class Main {
 			}
 
 			try {
-				stmt.executeUpdate(query);
+				int affectedTuples = stmt.executeUpdate(query);
+				checkSuccessInsert(affectedTuples);
 			} catch (Exception e) {
 				System.out.println("The query could not be executed for the following reason:");
 				System.out.println(e.getMessage() + "\n\n");
@@ -208,7 +210,8 @@ public class Main {
 			query += ")";
 
 			try {
-				stmt.executeUpdate(query);
+				int affectedTuples = stmt.executeUpdate(query);
+				checkSuccessInsert(affectedTuples);
 			} catch (Exception e) {
 				System.out.println("The query could not be executed for the following reason:");
 				System.out.println(e.getMessage() + "\n\n");
@@ -259,47 +262,39 @@ public class Main {
 			System.out.println("To add a review, please provide the following inputs:");
 
 			String content = requestString("Review content");
-//			System.out.println("Rating number");
-			int rating=0;
+			// System.out.println("Rating number");
+			int rating = 0;
 			isValid = false;
-			while (isValid == false){
+			while (isValid == false) {
 				System.out.println("Rating number");
-				if (reader.hasNextInt())
-				{
+				if (reader.hasNextInt()) {
 					rating = reader.nextInt();
 					isValid = true;
-				}
-				else
-				{
-					System.out.println(
-							"Invalid entry. Try again.");
+				} else {
+					System.out.println("Invalid entry. Try again.");
 				}
 				reader.nextLine();
-				if(isValid==true && (rating < 1 || rating > 5)){
+				if (isValid == true && (rating < 1 || rating > 5)) {
 					System.out.println("Invalid number. Please choose a number 1 to 5");
 				}
 			}
-      
+
 			String name = requestString("Your name");
-//			int bid = requestInteger("Booking ID");
+			// int bid = requestInteger("Booking ID");
 			int bid = -1;
 			isValid = false;
-			while (isValid == false){
+			while (isValid == false) {
 				System.out.println("Booking ID");
-				if (reader.hasNextInt())
-				{
+				if (reader.hasNextInt()) {
 					bid = reader.nextInt();
 					isValid = true;
-				}
-				else
-				{
-					System.out.println(
-							"Invalid entry. Try again.");
+				} else {
+					System.out.println("Invalid entry. Try again.");
 				}
 				reader.nextLine();
 			}
 			if (reviewer == 1) {
-//				System.out.println("host");
+				// System.out.println("host");
 				String query = "INSERT INTO Review VALUES (";
 				query += formatString(content, true);
 				query += formatString(Integer.toString(rating), true);
@@ -307,18 +302,16 @@ public class Main {
 				query += formatString(Integer.toString(bid), false);
 				query += ")";
 
-        int affectedTuples;
-        
 				try {
-					affectedTuples = stmt.executeUpdate(query);
-          checkSuccessInsert(affectedTuples);
+					int affectedTuples = stmt.executeUpdate(query);
+					checkSuccessInsert(affectedTuples);
 				} catch (Exception e) {
 					System.out.println("The query could not be executed for the following reason:");
 					System.out.println(e.getMessage() + "\n\n");
 				}
-				
+
 			} else if (reviewer == 2) {
-//				System.out.println("guest");
+				// System.out.println("guest");
 				String query = "INSERT INTO Critique VALUES (";
 				query += formatString(content, true);
 				query += formatString(Integer.toString(rating), true);
@@ -326,11 +319,9 @@ public class Main {
 				query += formatString(Integer.toString(bid), false);
 				query += ")";
 
-        int affectedTuples;
-
 				try {
-					affectedTuples = stmt.executeUpdate(query);
-          checkSuccessInsert(affectedTuples);
+					int affectedTuples = stmt.executeUpdate(query);
+					checkSuccessInsert(affectedTuples);
 				} catch (Exception e) {
 					System.out.println("The query could not be executed for the following reason:");
 					System.out.println(e.getMessage() + "\n\n");
@@ -340,11 +331,10 @@ public class Main {
 		}
 	}
 
-	private static void checkSuccessInsert(int numChangedEntries){
-		if (numChangedEntries != 0){
+	private static void checkSuccessInsert(int numChangedEntries) {
+		if (numChangedEntries != 0) {
 			System.out.println("Successfully inserted the entry into the table");
-		}
-		else {
+		} else {
 			System.out.println("Unsuccessful in inserting entry into table");
 		}
 	}
