@@ -137,7 +137,8 @@ public class Main {
 			query += ")";
 
 			try {
-				stmt.executeUpdate(query);
+				int affectedTuples = stmt.executeUpdate(query);
+				checkSuccessInsert(affectedTuples);
 			} catch (Exception e) {
 				System.out.println("The query could not be executed for the following reason:");
 				System.out.println(e.getMessage() + "\n\n");
