@@ -9,6 +9,7 @@ package comp421.gr45.app;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.ResultSet;
+import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.InputMismatchException;
@@ -39,6 +40,8 @@ public class Main {
 		// Close the connection and statement when done
 		stmt.close();
 		conn.close();
+		
+		System.out.println("Successfully closed Statement and Connection objects.");
 	}
 
 	public static void execLoop() throws SQLException {
@@ -182,7 +185,8 @@ public class Main {
 			query += ")";
 
 			try {
-				stmt.executeQuery(query);
+				ResultSet rs = stmt.executeQuery(query);
+				displayRS(rs);
 			} catch (Exception e) {
 				System.out.println("The query could not be executed for the following reason:");
 				System.out.println(e.getMessage() + "\n\n");
@@ -227,7 +231,8 @@ public class Main {
 					+ formattedEnd;
 
 			try {
-				stmt.executeQuery(query);
+				ResultSet rs = stmt.executeQuery(query);
+				displayRS(rs);
 			} catch (Exception e) {
 				System.out.println("The query could not be executed for the following reason:");
 				System.out.println(e.getMessage() + "\n\n");
@@ -329,6 +334,23 @@ public class Main {
 			}
 		}
 	}
+	
+	private static void displayRS(ResultSet rs) throws SQLException {
+		ResultSetMetaData rsmd = rs.getMetaData();
+		
+		for (int i = 1; i <= rsmd.getColumnCount(); i++) {
+			System.out.print(rsmd.getColumnName(i) + " | ");
+		}
+		
+		System.out.println();
+		
+		while (rs.next()) {
+			for (int i = 1; i <= rsmd.getColumnCount(); i++) {
+				System.out.print(rs.getObject(i) + " | ");
+			}
+			System.out.println();
+		}
+	}
 
 	private static void checkSuccessInsert(int numChangedEntries) {
 		if (numChangedEntries != 0) {
@@ -361,7 +383,7 @@ public class Main {
 
 	private static String requestDate(String inputName) {
 		System.out.println(inputName + "? Please input as DD/MM/YYYY.");
-		String result = reader.nextLine();
+		String result = reader.next();
 		while (!dateValid(result)) {
 			System.out.println("Invalid date format. Please enter the date as DD/MM/YYYY (including slashes)");
 			result = reader.next();
