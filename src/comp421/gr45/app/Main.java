@@ -23,7 +23,7 @@ public class Main {
 
 	public static void main(String[] args) throws SQLException {
 
-		// Load the Postgres JDBC driver
+		// Load the Postgre JDBC driver
 		try {
 			DriverManager.registerDriver(new org.postgresql.Driver());
 		} catch (Exception e) {
@@ -170,6 +170,24 @@ public class Main {
 		} else if (choice == 4) { // Send message
 
 			System.out.println("To write a new message, please provide the following information:");
+			System.out.println("Start time:");
+			int hour = requestInteger("\tHour"), minute = requestInteger("\tMinute"), second = 0;
+			
+			String date = requestDate("Date");
+			
+			String content = requestString("Message content (max 512 chars)");
+			String fromUser = requestString("Message sender");
+			String toUser = requestString("Message receiver");
+			
+			String query = "INSERT INTO Message VALUES (";
+			query += formatTime(hour, minute, second, true);
+			query += formatDate(date, true);
+			query += formatString(content, true);
+			query += formatString(fromUser, true);
+			query += formatString(toUser, false);
+			query += ")";
+			
+			stmt.executeUpdate(query);
 
 		} else if (choice == 5) { // List bookings over date range
 
@@ -292,9 +310,9 @@ public class Main {
 			queryFormattedDate += (month + "-");
 
 		if (day < 10)
-			queryFormattedDate += ("0" + day + "-");
+			queryFormattedDate += ("0" + day);
 		else
-			queryFormattedDate += (day + "-");
+			queryFormattedDate += day;
 
 		if (addComma)
 			queryFormattedDate += "', ";
@@ -302,6 +320,32 @@ public class Main {
 			queryFormattedDate += "'";
 
 		return queryFormattedDate;
+	}
+	
+	private static String formatTime(int hour, int minute, int second, boolean addComma) {
+		String formattedTime = "'";
+		
+		if (hour < 10)
+			formattedTime += ("0" + hour + ":");
+		else
+			formattedTime += (hour + ":");
+		
+		if (minute < 10)
+			formattedTime += ("0" + minute + ":");
+		else
+			formattedTime += (minute + ":");
+		
+		if (second < 10) {
+			formattedTime += ("0" + second);
+		} else
+			formattedTime += second;
+		
+		if (addComma)
+			formattedTime += "', ";
+		else
+			formattedTime += "'";
+		
+		return formattedTime;
 	}
 
 	private static boolean dateValid(String date) {
