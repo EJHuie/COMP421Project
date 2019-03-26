@@ -1,5 +1,5 @@
 //TODO
-// 3, 4, 5, 6
+// 3, 4, 5, 6 DONE
 // Helper method to print tuples for 3 and 5
 // Check successful insert in 1, 2, 4, 6
 // Take screenshots for submission
@@ -107,7 +107,7 @@ public class Main {
 			query += ("0, ");
 			query += formatString(host, false);
 			query += ")";
-			
+
 			try {
 				stmt.executeUpdate(query);
 			} catch (Exception e) {
@@ -192,13 +192,13 @@ public class Main {
 			System.out.println("To write a new message, please provide the following information:");
 			System.out.println("Start time:");
 			int hour = requestInteger("\tHour"), minute = requestInteger("\tMinute"), second = 0;
-			
+
 			String date = requestDate("Date");
-			
+
 			String content = requestString("Message content (max 512 chars)");
 			String fromUser = requestString("Message sender");
 			String toUser = requestString("Message receiver");
-			
+
 			String query = "INSERT INTO Message VALUES (";
 			query += formatTime(hour, minute, second, true);
 			query += formatDate(date, true);
@@ -206,7 +206,7 @@ public class Main {
 			query += formatString(fromUser, true);
 			query += formatString(toUser, false);
 			query += ")";
-			
+
 			try {
 				stmt.executeUpdate(query);
 			} catch (Exception e) {
@@ -278,7 +278,7 @@ public class Main {
 					System.out.println("The query could not be executed for the following reason:");
 					System.out.println(e.getMessage() + "\n\n");
 				}
-				
+
 			} else if (reviewer == 2) {
 				System.out.println("guest");
 				String query = "INSERT INTO Critique VALUES (";
@@ -362,30 +362,30 @@ public class Main {
 
 		return queryFormattedDate;
 	}
-	
+
 	private static String formatTime(int hour, int minute, int second, boolean addComma) {
 		String formattedTime = "'";
-		
+
 		if (hour < 10)
 			formattedTime += ("0" + hour + ":");
 		else
 			formattedTime += (hour + ":");
-		
+
 		if (minute < 10)
 			formattedTime += ("0" + minute + ":");
 		else
 			formattedTime += (minute + ":");
-		
+
 		if (second < 10) {
 			formattedTime += ("0" + second);
 		} else
 			formattedTime += second;
-		
+
 		if (addComma)
 			formattedTime += "', ";
 		else
 			formattedTime += "'";
-		
+
 		return formattedTime;
 	}
 
