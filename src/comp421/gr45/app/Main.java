@@ -6,7 +6,6 @@
 
 // check true/false in format calls
 
-
 package comp421.gr45.app;
 
 import java.sql.Connection;
@@ -23,14 +22,14 @@ public class Main {
 	private static Connection conn;
 
 	public static void main(String[] args) throws SQLException {
-		
+
 		// Load the Postgres JDBC driver
 		try {
-		DriverManager.registerDriver(new org.postgresql.Driver());
+			DriverManager.registerDriver(new org.postgresql.Driver());
 		} catch (Exception e) {
 			System.out.println("Class not found");
 		}
-		
+
 		String url = "jdbc:postgresql://comp421.cs.mcgill.ca:5432/cs421";
 
 		// Connect
@@ -124,7 +123,7 @@ public class Main {
 			while (!type.equalsIgnoreCase("host") && !type.equalsIgnoreCase("guest")) {
 				type = requestString("Guest or Host");
 			}
-			
+
 			String query = "INSERT INTO UserAccount VALUES (";
 			query += formatString(user, true);
 			query += formatString(pass, true);
@@ -132,9 +131,9 @@ public class Main {
 			query += formatString(gder, true);
 			query += formatDate(date, false);
 			query += ")";
-			
+
 			stmt.executeUpdate(query);
-			
+
 			query = "INSERT INTO ";
 			if (type.equalsIgnoreCase("Host")) {
 				query += "Host VALUES (";
@@ -146,73 +145,74 @@ public class Main {
 				query += "0";
 				query += ")";
 			}
-			
+
 			stmt.executeUpdate(query);
-			
 
 		} else if (choice == 3) { // List available properties
 
 			System.out.println("Please indicate the city and date range for your search.");
-			
+
 			String city = requestString("City");
 			String start = requestDate("Start Date"), formattedStart = formatDate(start, false);
 			String end = requestDate("End Date"), formattedEnd = formatDate(end, false);
-			
-			String subquery = "SELECT property FROM Availability WHERE startDate <= " + formattedStart + " AND endDate >= " + formattedEnd;
-			
+
+			String subquery = "SELECT property FROM Availability WHERE startDate <= " + formattedStart
+					+ " AND endDate >= " + formattedEnd;
+
 			String query = "SELECT * FROM Property WHERE cityName = ";
 			query += formatString(city, false);
 			query += " AND address IN (";
 			query += subquery;
 			query += ")";
-			
+
 			stmt.executeQuery(query);
-			
-		} else if (choice == 4) { // Request Booking
+
+		} else if (choice == 4) { // Send message
+
+			System.out.println("To write a new message, please provide the following information:");
 
 		} else if (choice == 5) { // List bookings over date range
-			
+
 			System.out.println("Please indicate the date range for your search.");
-			
+
 			String start = requestDate("Start Date"), formattedStart = formatDate(start, false);
 			String end = requestDate("End Date"), formattedEnd = formatDate(end, false);
-			
-			String query = "SELECT * FROM Booking WHERE startDate >= " + formattedStart + " AND endDate <= " + formattedEnd;
-			
+
+			String query = "SELECT * FROM Booking WHERE startDate >= " + formattedStart + " AND endDate <= "
+					+ formattedEnd;
+
 			stmt.executeQuery(query);
 
-
 		} else { // Add review or critique
-			int reviewer=0;
+			int reviewer = 0;
 			boolean isValid = false;
-			while (isValid == false){
-				System.out.println("Specify if you are a writing a review as a host or guest. Type 1 if you are the host or 2 if you are the guest: ");
-				if (reader.hasNextInt())
-				{
+			while (isValid == false) {
+				System.out.println(
+						"Specify if you are a writing a review as a host or guest. Type 1 if you are the host or 2 if you are the guest: ");
+				if (reader.hasNextInt()) {
 					reviewer = reader.nextInt();
 					isValid = true;
-				}
-				else
-				{
-					System.out.println(
-							"Invalid entry. Try again.");
+				} else {
+					System.out.println("Invalid entry. Try again.");
 				}
 				reader.nextLine();
-				if(isValid==true && (reviewer < 1 || reviewer > 2)){
-					System.out.println("Invalid number. Please choose enter 1 if you are the host or 2 if you are the guest");
+				if (isValid == true && (reviewer < 1 || reviewer > 2)) {
+					System.out.println(
+							"Invalid number. Please choose enter 1 if you are the host or 2 if you are the guest");
 				}
 			}
 
-//			while (!reader.hasNextInt() &&(reviewer < 1 || reviewer > 2)) {
-//				System.out.println("Invalid character found, please enter 1 if you are the host or 2 if you are the guest");
-//				reviewer = reader.next();
-//			}
+			// while (!reader.hasNextInt() &&(reviewer < 1 || reviewer > 2)) {
+			// System.out.println("Invalid character found, please enter 1 if you are the
+			// host or 2 if you are the guest");
+			// reviewer = reader.next();
+			// }
 
 			System.out.println("To add a review, please provide the following inputs:");
 
 			String content = requestString("Review content");
 			System.out.println("Rating number");
-			int rating = promptVal(1,5);
+			int rating = promptVal(1, 5);
 			String name = requestString("Your name");
 			int bid = requestInteger("Booking ID");
 			if (reviewer == 1) {
@@ -247,16 +247,17 @@ public class Main {
 
 	private static int requestInteger(String inputName) {
 		System.out.println(inputName + "?");
-		int resultNum = 0;
-		boolean checkInt= false;
-		while (checkInt==false) {
+		int resultNum = -1;
+
+		while (resultNum == -1) {
 			try {
 				resultNum = reader.nextInt();
-				checkInt = true;
-			} catch (Exception e) {
-				System.out.println("Invalid character found, please enter numeric values only");
+			} catch (InputMismatchException e) {
+				System.out.println("Invalid. Please write an integer.");
+				reader.next();
 			}
 		}
+
 		return resultNum;
 	}
 
@@ -276,30 +277,30 @@ public class Main {
 			formatted += ", ";
 		return formatted;
 	}
-	
+
 	private static String formatDate(String date, boolean addComma) {
 		String queryFormattedDate = "'";
-		
+
 		String[] split = date.split("/");
 		int day = Integer.parseInt(split[0]), month = Integer.parseInt(split[1]), year = Integer.parseInt(split[2]);
-		
+
 		queryFormattedDate += (year + "-");
-		
+
 		if (month < 10)
 			queryFormattedDate += ("0" + month + "-");
 		else
 			queryFormattedDate += (month + "-");
-		
+
 		if (day < 10)
 			queryFormattedDate += ("0" + day + "-");
 		else
 			queryFormattedDate += (day + "-");
-		
+
 		if (addComma)
 			queryFormattedDate += "', ";
 		else
 			queryFormattedDate += "'";
-		
+
 		return queryFormattedDate;
 	}
 
