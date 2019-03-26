@@ -1,9 +1,3 @@
-//TODO
-// 3, 4, 5, 6 DONE
-// Helper method to print tuples for 3 and 5
-// Check successful insert in 1, 2, 4, 6 DONE
-// Take screenshots for submission
-
 package comp421.gr45.app;
 
 import java.sql.Connection;
@@ -51,7 +45,7 @@ public class Main {
 		while (choice != 7) {
 			System.out.println("What would you like to do?");
 
-			options();
+			displayOptions();
 
 			choice = promptVal(1, 7);
 			if (choice == 7) {
@@ -63,7 +57,7 @@ public class Main {
 		}
 	}
 
-	private static void options() {
+	private static void displayOptions() {
 		System.out.println("1 - Add Property");
 		System.out.println("2 - Create Account");
 		System.out.println("3 - List available properties for given city/dates");
@@ -147,7 +141,7 @@ public class Main {
 				System.out.println(e.getMessage() + "\n\n");
 			}
 
-			query = "INSERT INTO ";
+			query = "INSERT INTO "; // second query because tuple needs to be added to both UserAccount and Host/Guest
 			if (type.equalsIgnoreCase("Host")) {
 				query += "Host VALUES (";
 				query += formatString(user, false);
@@ -256,17 +250,11 @@ public class Main {
 							"Invalid number. Please choose enter 1 if you are the host or 2 if you are the guest");
 				}
 			}
-
-			// while (!reader.hasNextInt() &&(reviewer < 1 || reviewer > 2)) {
-			// System.out.println("Invalid character found, please enter 1 if you are the
-			// host or 2 if you are the guest");
-			// reviewer = reader.next();
-			// }
+			
 
 			System.out.println("To add a review, please provide the following inputs:");
 
 			String content = requestString("Review content");
-			// System.out.println("Rating number");
 			int rating = 0;
 			isValid = false;
 			while (isValid == false) {
@@ -284,7 +272,6 @@ public class Main {
 			}
 
 			String name = requestString("Your name");
-			// int bid = requestInteger("Booking ID");
 			int bid = -1;
 			isValid = false;
 			while (isValid == false) {
@@ -298,7 +285,6 @@ public class Main {
 				reader.nextLine();
 			}
 			if (reviewer == 1) {
-				// System.out.println("host");
 				String query = "INSERT INTO Review VALUES (";
 				query += formatString(content, true);
 				query += formatString(Integer.toString(rating), true);
@@ -315,7 +301,6 @@ public class Main {
 				}
 
 			} else if (reviewer == 2) {
-				// System.out.println("guest");
 				String query = "INSERT INTO Critique VALUES (";
 				query += formatString(content, true);
 				query += formatString(Integer.toString(rating), true);
@@ -339,14 +324,14 @@ public class Main {
 		ResultSetMetaData rsmd = rs.getMetaData();
 		
 		for (int i = 1; i <= rsmd.getColumnCount(); i++) {
-			System.out.print(rsmd.getColumnName(i) + " | ");
+			System.out.print(rsmd.getColumnName(i) + " | "); // display column names as first row of the table
 		}
 		
 		System.out.println();
 		
-		while (rs.next()) {
+		while (rs.next()) { // for each tuple
 			for (int i = 1; i <= rsmd.getColumnCount(); i++) {
-				System.out.print(rs.getObject(i) + " | ");
+				System.out.print(rs.getObject(i) + " | "); // display the values of each attribute
 			}
 			System.out.println();
 		}
@@ -406,12 +391,12 @@ public class Main {
 
 		queryFormattedDate += (year + "-");
 
-		if (month < 10)
-			queryFormattedDate += ("0" + month + "-");
+		if (month < 10) 
+			queryFormattedDate += ("0" + month + "-"); // adding a 0 to keep the month at two digits, e.g. "5" --> "05"
 		else
 			queryFormattedDate += (month + "-");
 
-		if (day < 10)
+		if (day < 10) // same for day
 			queryFormattedDate += ("0" + day);
 		else
 			queryFormattedDate += day;
